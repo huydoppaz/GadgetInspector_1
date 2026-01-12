@@ -1,0 +1,39 @@
+name: Java CI with Gradle
+
+on:
+  push:
+    # Trigger trên tất cả các branch mỗi khi có push
+    branches: ["**"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 8
+      uses: actions/setup-java@v4
+      with:
+        java-version: '8'
+        distribution: 'temurin'
+
+    # Thiết lập Gradle và cache để tối ưu tốc độ build
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+
+    - name: Build with Gradle Wrapper
+      run: ./gradlew build
+
+    # Bước này sẽ "publish" file JAR bằng cách upload nó thành Artifact
+    # Bạn có thể tải file này về từ tab "Actions" trên GitHub
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: java-app-jar
+        # Đường dẫn mặc định của Gradle sau khi build xong
+        path: build/libs/*.jar
+        retention-days: 5
